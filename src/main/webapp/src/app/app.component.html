@@ -1,3 +1,26 @@
-<div>Hello world!</div>
+<h1>Virtual Express</h1>
+<form [formGroup]="pricingForm">
+  <div>
+    <label>From Zipcode</label>
+    <input formControlName="fromZip" id="fromZip" type="text"/>
+  </div>
+  <div>
+    <label>To Zipcode</label>
+    <input formControlName="toZip" id="toZipcode" type="text"/>
+    <label>{{ fromAddress }}</label>
+  </div>
+  <div>
+    <label>Weight (lbs)</label>
+    <input formControlName="weight" id="weight" type="text"/>
+    <label>{{ toAddress }}</label>
+  </div>
+  <div>
+    <button (click)="onCalculate()" id="calculate" type="button">Calculate</button>
+  </div>
+  <div>
+    <label>{{ price }}</label>
+  </div>
+</form>
+
 
 <router-outlet></router-outlet>
