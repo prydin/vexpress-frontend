@@ -1,26 +1,85 @@
-<h1>Virtual Express</h1>
-<form [formGroup]="pricingForm">
-  <div>
-    <label>From Zipcode</label>
-    <input formControlName="fromZip" id="fromZip" type="text"/>
-  </div>
-  <div>
-    <label>To Zipcode</label>
-    <input formControlName="toZip" id="toZipcode" type="text"/>
-    <label>{{ fromAddress }}</label>
-  </div>
-  <div>
-    <label>Weight (lbs)</label>
-    <input formControlName="weight" id="weight" type="text"/>
-    <label>{{ toAddress }}</label>
-  </div>
-  <div>
-    <button (click)="onCalculate()" id="calculate" type="button">Calculate</button>
-  </div>
-  <div>
-    <label>{{ price }}</label>
-  </div>
-</form>
+<main cds-layout="vertical gap:lg p:lg" cds-text="body">
 
+  <div class="main-container">
+
+    <header class="header-6">
+      <div class="branding">
+        <a href="javascript://">
+          <clr-icon shape="vm-bug"></clr-icon>
+          <span class="title">Virtual Express</span>
+        </a>
+      </div>
+      <div class="settings">
+        <a aria-label="settings" class="nav-link nav-icon" href="javascript://">
+          <clr-icon shape="cog"></clr-icon>
+        </a>
+      </div>
+    </header>
+
+    <div class="content-container">
+      <div class="content-area">
+        <div class="card">
+          <div class="card-header">
+            Shipping Information
+          </div>
+          <div class="card-block">
+            <form [formGroup]="pricingForm">
+              <div>
+                <label>From Zipcode</label><br/>
+                <input formControlName="fromZip" id="fromZip" type="text"/>
+                <label>{{ fromAddress }}</label>
+              </div>
+              <div>
+                <label>To Zipcode</label><br/>
+                <input formControlName="toZip" id="toZipcode" type="text"/>
+                <label>{{ toAddress }}</label>
+              </div>
+              <div>
+                <label>Weight (lbs)</label><br/>
+                <input formControlName="weight" id="weight" type="text"/>
+              </div>
+              <div>
+                <button (click)="onCalculate()" id="calculate" type="button">Calculate</button>
+                <button (click)="onShip()" id="onShip" type="button">Ship!</button>
+              </div>
+              <cds-divider></cds-divider>
+              <h3>
+                <label>Distance: {{ distance | number: '1.2'}} miles</label>
+              </h3>
+              <h3>
+                <label>Shipping cost: {{ price | currency}}</label>
+              </h3>
+            </form>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              Shipment Tracking
+            </div>
+            <div class="card-block">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Tracking number</th>
+                  <th>From Zip</th>
+                  <th>To Zip</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let order of orders">
+                  <td></td>
+                  <td>{{order.trackingNumber}}</td>
+                  <td>{{order.fromZip}}</td>
+                  <td>{{order.toZip}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
 
 <router-outlet></router-outlet>

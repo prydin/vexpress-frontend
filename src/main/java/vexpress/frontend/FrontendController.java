@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,7 +64,10 @@ public class FrontendController {
     final RoutedRequest rrq = FrontendController.parseUrl(rq);
     final RestTemplate restTemplate = new RestTemplate();
     final String baseUrl = serviceMap.get(rrq.service);
-    return restTemplate.postForObject(new URI(rrq.buildURL(baseUrl)), payload, String.class);
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    final HttpEntity<String> entity = new HttpEntity<>(payload, headers);
+    return restTemplate.postForObject(new URI(rrq.buildURL(baseUrl)), entity, String.class);
   }
 
   private static final class RoutedRequest {
