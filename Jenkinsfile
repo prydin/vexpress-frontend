@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './gradlew clean assemble'
+                sh 'cd src/main/webapp; npm install; cd ../../..; ./gradlew clean assemble'
             }
         }
 
