@@ -21,4 +21,6 @@ export class SchedulingRequest {
   public toZip: string;
   public trackingNumber: string = '';
   public weight: number;
+  public timeSubmitted: number = 0;
+  public status: string = 'Submitted';
 }

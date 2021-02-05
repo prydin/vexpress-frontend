@@ -24,23 +24,29 @@
           </div>
           <div class="card-block">
             <form [formGroup]="pricingForm">
-              <div>
-                <label>From Zipcode</label><br/>
-                <input formControlName="fromZip" id="fromZip" type="text"/>
-                <label>{{ fromAddress }}</label>
+              <div class="card">
+                <div class="card-block">
+                  <div>
+                    <label>From Zipcode</label><br/>
+                    <input formControlName="fromZip" id="fromZip" type="text"/>
+                    <label>{{ fromAddress }}</label>
+                  </div>
+                  <div>
+                    <label>To Zipcode</label><br/>
+                    <input formControlName="toZip" id="toZipcode" type="text"/>
+                    <label>{{ toAddress }}</label>
+                  </div>
+                  <div>
+                    <label>Weight (lbs)</label><br/>
+                    <input formControlName="weight" id="weight" type="text"/>
+                  </div>
+                </div>
               </div>
               <div>
-                <label>To Zipcode</label><br/>
-                <input formControlName="toZip" id="toZipcode" type="text"/>
-                <label>{{ toAddress }}</label>
-              </div>
-              <div>
-                <label>Weight (lbs)</label><br/>
-                <input formControlName="weight" id="weight" type="text"/>
-              </div>
-              <div>
-                <button (click)="onCalculate()" id="calculate" type="button">Calculate</button>
-                <button (click)="onShip()" id="onShip" type="button">Ship!</button>
+                <button (click)="onCalculate()" class="btn btn-primary" id="calculate" type="button">Calculate</button>
+                <button (click)="onShip()" [clrLoading]="shipBtnState" class="btn btn-primary" id="onShip"
+                        type="button">Ship!
+                </button>
               </div>
               <cds-divider></cds-divider>
               <h3>
@@ -56,24 +62,20 @@
               Shipment Tracking
             </div>
             <div class="card-block">
-              <table class="table">
-                <thead>
-                <tr>
-                  <th>Status</th>
-                  <th>Tracking number</th>
-                  <th>From Zip</th>
-                  <th>To Zip</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let order of orders">
-                  <td></td>
-                  <td>{{order.trackingNumber}}</td>
-                  <td>{{order.fromZip}}</td>
-                  <td>{{order.toZip}}</td>
-                </tr>
-                </tbody>
-              </table>
+              <clr-datagrid>
+                <clr-dg-column [clrDgField]="'timeSubmitted'">Time Submitted</clr-dg-column>
+                <clr-dg-column>Status</clr-dg-column>
+                <clr-dg-column [clrDgField]="'trackingNumber'">Tracking Number</clr-dg-column>
+                <clr-dg-column [clrDgField]="'fromZip'">From Zip</clr-dg-column>
+                <clr-dg-column [clrDgField]="'toZip'">To Zip</clr-dg-column>
+                <clr-dg-row *clrDgItems="let order of orders">
+                  <clr-dg-cell>{{order.timeSubmitted | date:'yyyy-MM-dd HH:mm'}}</clr-dg-cell>
+                  <clr-dg-cell>{{order.status}}</clr-dg-cell>
+                  <clr-dg-cell>{{order.trackingNumber}}</clr-dg-cell>
+                  <clr-dg-cell>{{order.fromZip}}</clr-dg-cell>
+                  <clr-dg-cell>{{order.toZip}}</clr-dg-cell>
+                </clr-dg-row>
+              </clr-datagrid>
             </div>
           </div>
         </div>
