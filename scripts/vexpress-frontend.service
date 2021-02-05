@@ -1,0 +1,9 @@
+[Unit]
+Description=vExpress frontend
+
+[Service]
+WorkingDirectory=/opt/vexpress-frontend
+ExecStart=/usr/bin/java -Xmx512m -jar /opt/vexpress-frontend/vexpress-frontend.jar
+
+[Install]
+WantedBy=multi-user.target

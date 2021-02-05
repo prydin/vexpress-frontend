@@ -69,12 +69,11 @@ pipeline {
 
         stage('Configure') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER'),
-                                 usernamePassword(credentialsId: 'rabbitMqCreds', passwordVariable: 'RABBITMQ_PASSWORD', usernameVariable: 'RABBITMQ_USER')]) {
+                withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
                         def txt = readFile(file: 'templates/application-properties.tpl')
                         txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
-                                txt.replace('$PRICING_URL', params.PRICING_URL).
+                                replace('$PRICING_URL', params.PRICING_URL).
                                 replace('$ORDERS_URL', params.ORDERS_URL).
                                 replace('$SCHEDULING_URL', params.SCHEDULING_URL)
                         writeFile(file: "application.properties", text: txt)
