@@ -33,6 +33,15 @@ processResources {
     dependsOn "buildAngular"
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDirs "build/main/resources", "src/main/resources"
+        }
+    }
+}
+
+
 task buildAngular(type: Exec) {
     workingDir "$webappDir"
     inputs.dir "$webappDir"
