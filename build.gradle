@@ -36,7 +36,7 @@ processResources {
 sourceSets {
     main {
         resources {
-            srcDirs "build/main/resources", "src/main/resources"
+            srcDirs "src/main/resources", "src/main/webapp/dist"
         }
     }
 }
