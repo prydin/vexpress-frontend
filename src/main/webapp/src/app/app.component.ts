@@ -3,7 +3,7 @@ import { timer, Observable, Subscription } from 'rxjs'
 import { FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ZipResponse, DistanceResponse, SchedulingRequest } from './structs'
-import { ClrLoadingState } from '@clr/angular';
+import { ClrLoadingState, ClrDatagridSortOrder } from '@clr/angular';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +28,8 @@ export class AppComponent implements OnInit, OnDestroy {
   timerSub?: Subscription;
 
   shipBtnState: ClrLoadingState = ClrLoadingState.DEFAULT;
+
+  descSort = ClrDatagridSortOrder.DESC;
 
   pricingForm = this.formBuilder.group({
     fromZip: '07945',
@@ -85,7 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
       error: error => console.error('Error submitting order', error),
       next: x => {
         this.shipBtnState = ClrLoadingState.LOADING;
-        timer(3000).subscribe({ 
+        timer(3000).subscribe({
           next: (t: number) => {
             this.loadOrders();
             this.shipBtnState = ClrLoadingState.DEFAULT;
