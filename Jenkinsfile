@@ -84,7 +84,7 @@ pipeline {
                         remote.user = USER
                         remote.password = PASSWORD
                         remote.allowAnyHosts = true
-                        
+
                         env.appIps.each { address ->
 
                             // The first first attempt may fail if cloud-init hasn't created user account yet
@@ -105,7 +105,7 @@ pipeline {
 }
 
 def getInternalAddresses(ids, resourceName) {
-    return ids.collect {
+    return ids.collect { id ->
         vraGetDeployment(
                 deploymentId: id,
                 expandResources: true)
