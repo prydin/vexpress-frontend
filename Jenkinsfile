@@ -69,9 +69,9 @@ pipeline {
 
         stage('Configure') {
             steps {
-                env.appIps.each { address ->
-                    withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-                        script {
+                withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+                    script {
+                        env.appIps.each { address ->
                             def txt = readFile(file: 'templates/application-properties.tpl')
                             txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
                                     replace('$PRICING_URL', params.PRICING_URL).
