@@ -71,20 +71,21 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
-                        env.appIps.each { address ->
-                            def txt = readFile(file: 'templates/application-properties.tpl')
-                            txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
-                                    replace('$PRICING_URL', params.PRICING_URL).
-                                    replace('$ORDERS_URL', params.ORDERS_URL).
-                                    replace('$SCHEDULING_URL', params.SCHEDULING_URL)
-                            writeFile(file: "application.properties", text: txt)
+                        def txt = readFile(file: 'templates/application-properties.tpl')
+                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
+                                replace('$PRICING_URL', params.PRICING_URL).
+                                replace('$ORDERS_URL', params.ORDERS_URL).
+                                replace('$SCHEDULING_URL', params.SCHEDULING_URL)
+                        writeFile(file: "application.properties", text: txt)
 
-                            def remote = [:]
-                            remote.name = 'appServer'
-                            remote.host = env.address
-                            remote.user = USER
-                            remote.password = PASSWORD
-                            remote.allowAnyHosts = true
+                        def remote = [:]
+                        remote.name = 'appServer'
+                        remote.host = env.address
+                        remote.user = USER
+                        remote.password = PASSWORD
+                        remote.allowAnyHosts = true
+                        
+                        env.appIps.each { address ->
 
                             // The first first attempt may fail if cloud-init hasn't created user account yet
                             retry(20) {
@@ -103,11 +104,11 @@ pipeline {
     }
 }
 
-def getInternalAddresses(id, resourceName) {
-    def dep = vraGetDeployment(
-            deploymentId: id,
-            expandResources: true
-    )
-    return dep.resources.find({ it.name.startsWith(resourceName) }).collect({ it.properties.networks[0].address })
+def getInternalAddresses(ids, resourceName) {
+    return ids.collect {
+        vraGetDeployment(
+                deploymentId: id,
+                expandResources: true)
+                .resources.findAll({ it.name.startsWith(resourceName) }).properties.networks[0].address
+    }
 }
-
