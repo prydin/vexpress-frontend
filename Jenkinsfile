@@ -60,7 +60,7 @@ pipeline {
                         vraWaitForAddress(
                                 deploymentId: depId,
                                 resourceName: 'JavaServer')[0]
-                        env.appIps = getInternalAddresses(depId, "JavaServer")
+                        env.appIps = getInternalAddresses(depId, "JavaServer").join(',')
                         echo "Deployed: ${depId} address: ${env.appIps}"
                     }
                 }
@@ -78,14 +78,14 @@ pipeline {
                                 replace('$SCHEDULING_URL', params.SCHEDULING_URL)
                         writeFile(file: "application.properties", text: txt)
 
-                        def remote = [:]
-                        remote.name = 'appServer'
-                        remote.host = env.address
-                        remote.user = USER
-                        remote.password = PASSWORD
-                        remote.allowAnyHosts = true
+                        env.appIps.split(',').each { address ->
 
-                        env.appIps.each { address ->
+                            def remote = [:]
+                            remote.name = 'appServer'
+                            remote.host = address
+                            remote.user = USER
+                            remote.password = PASSWORD
+                            remote.allowAnyHosts = true
 
                             // The first first attempt may fail if cloud-init hasn't created user account yet
                             retry(20) {
@@ -104,11 +104,9 @@ pipeline {
     }
 }
 
-def getInternalAddresses(ids, resourceName) {
-    return ids.collect { id ->
-        vraGetDeployment(
-                deploymentId: id,
-                expandResources: true)
-                .resources.findAll({ it.name.startsWith(resourceName) }).properties.networks[0].address
-    }
+def getInternalAddresses(id, resourceName) {
+    return vraGetDeployment(
+            deploymentId: id,
+            expandResources: true)
+            .resources.findAll({ it.name.startsWith(resourceName) }).collect { it.properties.networks[0].address }
 }
