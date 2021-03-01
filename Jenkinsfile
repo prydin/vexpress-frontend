@@ -60,8 +60,8 @@ pipeline {
                         vraWaitForAddress(
                                 deploymentId: depId,
                                 resourceName: 'JavaServer')[0]
-                        env.appIp = getInternalAddress(depId, "JavaServer")
-                        echo "Deployed: ${depId} address: ${env.appIp}"
+                        //env.appIp = getInternalAddress(depId, "JavaServer")
+                        //echo "Deployed: ${depId} address: ${env.appIp}"
                     }
                 }
             }
@@ -101,11 +101,4 @@ pipeline {
     }
 }
 
-def getInternalAddress(id, resourceName) {
-    def dep = vraGetDeployment(
-            deploymentId: id,
-            expandResources: true
-    )
-    return dep.resources.find({ it.name == resourceName }).properties.networks[0].address
-}
 
