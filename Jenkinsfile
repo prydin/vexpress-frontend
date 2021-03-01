@@ -60,8 +60,8 @@ pipeline {
                         vraWaitForAddress(
                                 deploymentId: depId,
                                 resourceName: 'JavaServer')[0]
-                        //env.appIp = getInternalAddress(depId, "JavaServer")
-                        //echo "Deployed: ${depId} address: ${env.appIp}"
+                        env.appIps = getInternalAddresses(depId, "JavaServer")
+                        echo "Deployed: ${depId} address: ${env.appIps}"
                     }
                 }
             }
@@ -69,31 +69,33 @@ pipeline {
 
         stage('Configure') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-                    script {
-                        def txt = readFile(file: 'templates/application-properties.tpl')
-                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
-                                replace('$PRICING_URL', params.PRICING_URL).
-                                replace('$ORDERS_URL', params.ORDERS_URL).
-                                replace('$SCHEDULING_URL', params.SCHEDULING_URL)
-                        writeFile(file: "application.properties", text: txt)
+                env.appIps.each { address ->
+                    withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+                        script {
+                            def txt = readFile(file: 'templates/application-properties.tpl')
+                            txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
+                                    replace('$PRICING_URL', params.PRICING_URL).
+                                    replace('$ORDERS_URL', params.ORDERS_URL).
+                                    replace('$SCHEDULING_URL', params.SCHEDULING_URL)
+                            writeFile(file: "application.properties", text: txt)
 
-                        def remote = [:]
-                        remote.name = 'appServer'
-                        remote.host = env.appIp
-                        remote.user = USER
-                        remote.password = PASSWORD
-                        remote.allowAnyHosts = true
+                            def remote = [:]
+                            remote.name = 'appServer'
+                            remote.host = env.address
+                            remote.user = USER
+                            remote.password = PASSWORD
+                            remote.allowAnyHosts = true
 
-                        // The first first attempt may fail if cloud-init hasn't created user account yet
-                        retry(20) {
-                            sleep time: 10, unit: 'SECONDS'
-                            sshPut remote: remote, from: 'application.properties', into: '/tmp'
+                            // The first first attempt may fail if cloud-init hasn't created user account yet
+                            retry(20) {
+                                sleep time: 10, unit: 'SECONDS'
+                                sshPut remote: remote, from: 'application.properties', into: '/tmp'
+                            }
+                            sshPut remote: remote, from: 'scripts/vexpress-frontend.service', into: '/tmp'
+                            sshPut remote: remote, from: 'scripts/configureAppserver.sh', into: '/tmp'
+                            sshCommand remote: remote, command: 'chmod +x /tmp/configureAppserver.sh'
+                            sshCommand remote: remote, sudo: true, command: "/tmp/configureAppserver.sh ${USER} ${env.apiUser} ${env.apiToken} ${env.BUILD_URL} ${env.version}"
                         }
-                        sshPut remote: remote, from: 'scripts/vexpress-frontend.service', into: '/tmp'
-                        sshPut remote: remote, from: 'scripts/configureAppserver.sh', into: '/tmp'
-                        sshCommand remote: remote, command: 'chmod +x /tmp/configureAppserver.sh'
-                        sshCommand remote: remote, sudo: true, command: "/tmp/configureAppserver.sh ${USER} ${env.apiUser} ${env.apiToken} ${env.BUILD_URL} ${env.version}"
                     }
                 }
             }
@@ -101,4 +103,11 @@ pipeline {
     }
 }
 
+def getInternalAddresses(id, resourceName) {
+    def dep = vraGetDeployment(
+            deploymentId: id,
+            expandResources: true
+    )
+    return dep.resources.find({ it.name.startsWith(resourceName) }).collect({ it.properties.networks[0].address })
+}
 
