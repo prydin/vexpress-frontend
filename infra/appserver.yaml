@@ -1,6 +1,6 @@
 count: 1
 catalogItemName: "frontend-java-14-ubuntu-18"
-version: "2"
+version: "3"
 deploymentName: "vexpress-frontend-app-#"
 projectName: "JenkinsTest"
 reason: "Deployment from Jenkins pipeline"
