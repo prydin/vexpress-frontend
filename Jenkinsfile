@@ -117,6 +117,6 @@ def getDefaultServiceUrl(service) {
         s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/prod/state.json", force: true)
         def json = readJSON(file: 'state.json')
         print("Found deployment record: " + json)
-        return json.rabbitMqIp
+        return json.url ? json.url : ''
     }
 }
