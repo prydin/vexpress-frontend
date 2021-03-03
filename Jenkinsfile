@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     parameters {
-        string(defaultValue: getDefaultServiceUrl('zipcode'), description: 'The Zipcode Service URL', name: 'ZIPCODE_URL', trim: true)
-        string(defaultValue: getDefaultServiceUrl("pricing"), description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
-        string(defaultValue: getDefaultServiceUrl('orders'), description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
-        string(defaultValue: getDefaultServiceUrl('scheduling'), description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
+        string(defaultValue: '', description: 'The Zipcode Service URL', name: 'ZIPCODE_URL', trim: true)
+        string(defaultValue: '', description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
+        string(defaultValue: '', description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
+        string(defaultValue: '', description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
     }
 
     stages {
@@ -72,10 +72,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
                         def txt = readFile(file: 'templates/application-properties.tpl')
-                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL).
-                                replace('$PRICING_URL', params.PRICING_URL).
-                                replace('$ORDERS_URL', params.ORDERS_URL).
-                                replace('$SCHEDULING_URL', params.SCHEDULING_URL)
+                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL ? params.ZIPCODE_URL : getDefaultServiceUrl('zipcode')).
+                                replace('$PRICING_URL', params.PRICING_URL ? params.PRICING_URL : getDefaultServiceUrl('pricing')).
+                                replace('$ORDERS_URL', params.ORDERS_URL ? params.ORDERS_URL : getDefaultServiceUrl('orders')).
+                                replace('$SCHEDULING_URL', params.SCHEDULING_URL ? params.SCHEDULING_URL : getDefaultServiceUrl('scheduling'))
                         writeFile(file: "application.properties", text: txt)
 
                         env.appIps.split(',').each { address ->
