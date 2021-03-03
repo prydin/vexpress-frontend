@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     parameters {
-        string(defaultValue: '', description: 'The Zipcode Service URL', name: 'ZIPCODE_URL', trim: true)
-        string(defaultValue: '', description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
-        string(defaultValue: '', description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
-        string(defaultValue: '', description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
+        string(defaultValue: getDefaultServiceUrl('zipcode'), description: 'The Zipcode Service URL', name: 'ZIPCODE_URL', trim: true)
+        string(defaultValue: getDefaultServiceUrl("pricing"), description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
+        string(defaultValue: getDefaultServiceUrl('orders'), description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
+        string(defaultValue: getDefaultServiceUrl('scheduling'), description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
     }
 
     stages {
@@ -109,4 +109,14 @@ def getInternalAddresses(id, resourceName) {
             deploymentId: id,
             expandResources: true)
             .resources.findAll({ it.name.startsWith(resourceName) }).collect { it.properties.networks[0].address }
+}
+
+def getDefaultServiceUrl(service) {
+    // Store build state
+    withAWS(credentials: 'jenkins') {
+        s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/prod/state.json", force: true)
+        def json = readJSON(file: 'state.json')
+        print("Found deployment record: " + json)
+        return json.rabbitMqIp
+    }
 }
