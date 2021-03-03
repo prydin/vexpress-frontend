@@ -1,0 +1,5 @@
+.app-background{
+     height:40em; background-size:cover; width:auto;
+     background-image:url('../assets/img/parcel-bg.jpg');
+     background-position:50% 50%;
+   }
