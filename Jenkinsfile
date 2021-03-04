@@ -6,6 +6,7 @@ pipeline {
         string(defaultValue: '', description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
         string(defaultValue: '', description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
         string(defaultValue: '', description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
+        string(defaultValue: 'dev', description: 'Target environment', name: 'ENVIRONMENT', trim: true)
     }
 
     stages {
@@ -15,6 +16,7 @@ pipeline {
                     def gradle = readFile(file: 'build.gradle')
                     env.version = (gradle =~ /version\s*=\s*["'](.+)["']/)[0][1]
                     echo "Inferred version: ${env.version}"
+                    env.ENVIRONMENT = params.ENVIRONMENT
                 }
             }
         }
@@ -114,7 +116,7 @@ def getInternalAddresses(id, resourceName) {
 def getDefaultServiceUrl(service) {
     // Store build state
     withAWS(credentials: 'jenkins') {
-        s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/prod/state.json", force: true)
+        s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/${env.ENVIRONMENT}/state.json", force: true)
         def json = readJSON(file: 'state.json')
         print("Found deployment record: " + json)
         return json.url ? json.url : ''
