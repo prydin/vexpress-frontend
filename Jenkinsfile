@@ -6,6 +6,12 @@ pipeline {
         string(defaultValue: '', description: 'The Pricing Service URL', name: 'PRICING_URL', trim: true)
         string(defaultValue: '', description: 'The Orders Service URL', name: 'ORDERS_URL', trim: true)
         string(defaultValue: '', description: 'The Scheduling Service URL', name: 'SCHEDULING_URL', trim: true)
+
+        string(defaultValue: '', description: 'The Zipcode Service environment', name: 'ZIPCODE_ENV', trim: true)
+        string(defaultValue: '', description: 'The Pricing Service environment', name: 'PRICING_ENV', trim: true)
+        string(defaultValue: '', description: 'The Orders Service environment', name: 'ORDERS_ENV', trim: true)
+        string(defaultValue: '', description: 'The Scheduling Service environment', name: 'SCHEDULING_ENV', trim: true)
+
         string(defaultValue: 'dev', description: 'Target environment', name: 'ENVIRONMENT', trim: true)
     }
 
@@ -74,10 +80,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
                         def txt = readFile(file: 'templates/application-properties.tpl')
-                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL ? params.ZIPCODE_URL : getDefaultServiceUrl('zipcode')).
-                                replace('$PRICING_URL', params.PRICING_URL ? params.PRICING_URL : getDefaultServiceUrl('pricing')).
-                                replace('$ORDERS_URL', params.ORDERS_URL ? params.ORDERS_URL : getDefaultServiceUrl('orders')).
-                                replace('$SCHEDULING_URL', params.SCHEDULING_URL ? params.SCHEDULING_URL : getDefaultServiceUrl('scheduling'))
+                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL ? params.ZIPCODE_URL : getDefaultServiceUrl('zipcode'), params.ZIPCODE_ENV).
+                                replace('$PRICING_URL', params.PRICING_URL ? params.PRICING_URL : getDefaultServiceUrl('pricing'), params.PRICING_ENV).
+                                replace('$ORDERS_URL', params.ORDERS_URL ? params.ORDERS_URL : getDefaultServiceUrl('orders'), params.ORDERS_ENV).
+                                replace('$SCHEDULING_URL', params.SCHEDULING_URL ? params.SCHEDULING_URL : getDefaultServiceUrl('scheduling'), params.SCHEDULING_ENV)
                         writeFile(file: "application.properties", text: txt)
 
                         env.appIps.split(',').each { address ->
@@ -113,12 +119,15 @@ def getInternalAddresses(id, resourceName) {
             .resources.findAll({ it.name.startsWith(resourceName) }).collect { it.properties.networks[0].address }
 }
 
-def getDefaultServiceUrl(service) {
+def getDefaultServiceUrl(service, environment) {
     // Store build state
+    if (!environment) {
+        environment = env.ENVIRONMENT
+    }
     withAWS(credentials: 'jenkins') {
-        s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/${env.ENVIRONMENT}/state.json", force: true)
+        s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/${environment}/state.json", force: true)
         def json = readJSON(file: 'state.json')
-        print("Found deployment record: " + json)
+        print("Found deployment record for ${environment}: ${json}")
         return json.url ? json.url : ''
     }
 }
