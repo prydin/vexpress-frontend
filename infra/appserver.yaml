@@ -1,6 +1,6 @@
 count: 1
 catalogItemName: "frontend-java-14-ubuntu-18"
-version: "3"
+version: "4"
 deploymentName: "vexpress-frontend-app-#"
 projectName: "JenkinsTest"
 reason: "Deployment from Jenkins pipeline"
@@ -8,3 +8,4 @@ inputs:
   environment: "AWS"
   user: "$USER"
   password: "$PASSWORD"
+  size: "tiny"
