@@ -80,10 +80,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
                         def txt = readFile(file: 'templates/application-properties.tpl')
-                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL ? params.ZIPCODE_URL : getDefaultServiceUrl('zipcode'), params.ZIPCODE_ENV).
-                                replace('$PRICING_URL', params.PRICING_URL ? params.PRICING_URL : getDefaultServiceUrl('pricing'), params.PRICING_ENV).
-                                replace('$ORDERS_URL', params.ORDERS_URL ? params.ORDERS_URL : getDefaultServiceUrl('orders'), params.ORDERS_ENV).
-                                replace('$SCHEDULING_URL', params.SCHEDULING_URL ? params.SCHEDULING_URL : getDefaultServiceUrl('scheduling'), params.SCHEDULING_ENV)
+                        txt = txt.replace('$ZIPCODE_URL', params.ZIPCODE_URL ? params.ZIPCODE_URL : getDefaultServiceUrl('zipcode', params.ZIPCODE_ENV)).
+                                replace('$PRICING_URL', params.PRICING_URL ? params.PRICING_URL : getDefaultServiceUrl('pricing', params.PRICING_ENV)).
+                                replace('$ORDERS_URL', params.ORDERS_URL ? params.ORDERS_URL : getDefaultServiceUrl('orders', params.ORDERS_ENV)).
+                                replace('$SCHEDULING_URL', params.SCHEDULING_URL ? params.SCHEDULING_URL : getDefaultServiceUrl('scheduling', params.SCHEDULING_ENV))
                         writeFile(file: "application.properties", text: txt)
 
                         env.appIps.split(',').each { address ->
