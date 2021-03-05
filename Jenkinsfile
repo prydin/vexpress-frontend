@@ -67,7 +67,8 @@ pipeline {
                                 config: readFile('infra/appserver.yaml'))[0].id
                         vraWaitForAddress(
                                 deploymentId: depId,
-                                resourceName: 'JavaServer')[0]
+                                resourceName: 'JavaServer',
+                                timeout: 600)[0]
                         env.appIps = getInternalAddresses(depId, "JavaServer").join(',')
                         echo "Deployed: ${depId} address: ${env.appIps}"
                     }
