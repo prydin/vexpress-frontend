@@ -13,6 +13,9 @@ pipeline {
         string(defaultValue: '', description: 'The Scheduling Service environment', name: 'SCHEDULING_ENV', trim: true)
 
         string(defaultValue: 'dev', description: 'Target environment', name: 'ENVIRONMENT', trim: true)
+
+        string(defaultValue: 'JenkinsTest', description: 'Project', name: 'PROJECT', trim: true)
+        string(defaultValue: 'AWS', description: 'Cloud', name: 'CLOUD', trim: true)
     }
 
     stages {
@@ -23,6 +26,8 @@ pipeline {
                     env.version = (gradle =~ /version\s*=\s*["'](.+)["']/)[0][1]
                     echo "Inferred version: ${env.version}"
                     env.ENVIRONMENT = params.ENVIRONMENT
+                    env.PROJECT = params.PROJECT ? params.PROJECT : "JenkinsTest" // TODO: Change to Virtual Express
+                    env.CLOUD = params.CLOUD ? params.CLOUD : "AWS"
                 }
             }
         }
@@ -63,9 +68,11 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'sshCreds', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     script {
                         def depId = vraDeployFromCatalog(
+                                trustSelfSignedCert: true,
                                 configFormat: "yaml",
                                 config: readFile('infra/appserver.yaml'))[0].id
                         vraWaitForAddress(
+                                trustSelfSignedCert: true,
                                 deploymentId: depId,
                                 resourceName: 'JavaServer',
                                 timeout: 600)[0]
@@ -115,6 +122,7 @@ pipeline {
 
 def getInternalAddresses(id, resourceName) {
     return vraGetDeployment(
+            trustSelfSignedCert: true,
             deploymentId: id,
             expandResources: true)
             .resources.findAll({ it.name.startsWith(resourceName) }).collect { it.properties.networks[0].address }
@@ -125,7 +133,7 @@ def getDefaultServiceUrl(service, environment) {
     if (!environment) {
         environment = env.ENVIRONMENT
     }
-    withAWS(credentials: 'jenkins') {
+    withAWS(credentials: 'jenkins', region: 'us-west-1') {
         s3Download(file: 'state.json', bucket: 'prydin-build-states', path: "vexpress/${service}/${environment}/state.json", force: true)
         def json = readJSON(file: 'state.json')
         print("Found deployment record for ${environment}: ${json}")
