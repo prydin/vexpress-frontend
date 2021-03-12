@@ -31,6 +31,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   descSort = ClrDatagridSortOrder.DESC;
 
+  enterAddress = false;
+
   pricingForm = this.formBuilder.group({
     fromZip: '07945',
     toZip: '10001',
@@ -90,7 +92,8 @@ export class AppComponent implements OnInit, OnDestroy {
         timer(3000).subscribe({
           next: (t: number) => {
             this.loadOrders();
-            this.shipBtnState = ClrLoadingState.DEFAULT;
+            this.shipBtnState = ClrLoadingState.DEFAULT
+            this.enterAddress = false
           }
         })
       }

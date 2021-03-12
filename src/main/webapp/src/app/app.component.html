@@ -50,7 +50,7 @@
                   <div>
                     <button (click)="onCalculate()" class="btn btn-primary" id="calculate" type="button">Calculate
                     </button>
-                    <button (click)="onShip()" [clrLoading]="shipBtnState" class="btn btn-primary" id="onShip"
+                    <button (click)="enterAddress =true" class="btn btn-primary" id="onShip"
                             type="button">Ship!
                     </button>
                   </div>
@@ -95,5 +95,37 @@
     </div>
   </div>
 </main>
+
+<clr-modal [(clrModalOpen)]="enterAddress">
+  <h3 class="modal-title">Destination Address</h3>
+  <div class="modal-body">
+    <form [formGroup]="pricingForm">
+      <div class="card">
+        <div class="card-block">
+          <div>
+            <label>Name</label><br/>
+            <input formControlName="toName" id="toName" type="text" value="John Doe"/>
+          </div>
+          <div>
+            <label>Street</label><br/>
+            <input formControlName="toName" id="toStreet" type="text" value="123 Main Street"/>
+          </div>
+          <div>
+            <label>City/State</label><br/>
+            <input formControlName="toName" id="toCity" type="text" value="{{ toAddress }}"/>
+          </div>
+          <div>
+            <label>Zipcode</label><br/>
+            <input formControlName="toName" id="tpZip" type="text" value="{{ pricingForm.get('toZip')?.value }}"/>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button (click)="enterAddress = false" class="btn btn-outline" type="button">Cancel</button>
+    <button (click)="onShip()" [clrLoading]="shipBtnState" class="btn btn-primary" type="button">Ok</button>
+  </div>
+</clr-modal>
 
 <router-outlet></router-outlet>
