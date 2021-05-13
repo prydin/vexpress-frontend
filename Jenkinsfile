@@ -75,7 +75,7 @@ pipeline {
                                 trustSelfSignedCert: true,
                                 deploymentId: depId,
                                 resourceName: 'JavaServer',
-                                timeout: 600)[0]
+                                timeout: 1800)[0]
                         env.appIps = getInternalAddresses(depId, "JavaServer").join(',')
                         echo "Deployed: ${depId} address: ${env.appIps}"
                     }

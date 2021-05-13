@@ -79,8 +79,8 @@
                       <clr-dg-cell>{{order.timeSubmitted | date:'yyyy-MM-dd HH:mm'}}</clr-dg-cell>
                       <clr-dg-cell>{{order.status}}</clr-dg-cell>
                       <clr-dg-cell>{{order.trackingNumber}}</clr-dg-cell>
-                      <clr-dg-cell>{{order.fromZip}}</clr-dg-cell>
-                      <clr-dg-cell>{{order.toZip}}</clr-dg-cell>
+                      <clr-dg-cell>{{zeroPad(order.fromZip)}}</clr-dg-cell>
+                      <clr-dg-cell>{{zeroPad(order.toZip)}}</clr-dg-cell>
                     </clr-dg-row>
                   </clr-datagrid>
                 </div>

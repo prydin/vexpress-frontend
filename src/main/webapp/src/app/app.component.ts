@@ -105,4 +105,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.http.get<SchedulingRequest[]>("router/scheduling/orders").
       subscribe({ next: data => this.orders = data });
   }
+
+  zeroPad(n: number): string {
+    let s = n.toString()
+    return s.length == 5 ? s : '0' + s
+  }
 }
