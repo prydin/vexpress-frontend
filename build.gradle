@@ -47,9 +47,9 @@ task buildAngular(type: Exec) {
     inputs.dir "$webappDir"
     group = BasePlugin.BUILD_GROUP
     if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")) {
-        commandLine "ng.cmd", "build"
+        commandLine "${webappDir}/node_modules/@angular/cli/bin/ng.cmd", "build"
     } else {
-        commandLine "ng", "build"
+        commandLine "${webappDir}/node_modules/@angular/cli/bin/ng", "build"
     }
 }
 
